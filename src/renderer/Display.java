@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 
 import javax.swing.JFrame;
+import java.awt.Toolkit;
 
 import rendererPoint.MyPoint;
 import rendererShapes.MyPolygon;
@@ -29,6 +30,8 @@ public class Display extends Canvas implements Runnable {
         this.frame = new JFrame();
         Dimension size = new Dimension(WIDTH, HEIGHT);
         this.setPreferredSize(size);
+        // Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        // this.setSize(screenSize.width, screenSize.height);
     }
 
     public static void main(String[] args) {
@@ -40,7 +43,6 @@ public class Display extends Canvas implements Runnable {
         display.frame.setLocationRelativeTo(null);
         display.frame.setResizable(false);
         display.frame.setVisible(true);
-
         display.Start();
     }
 
