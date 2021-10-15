@@ -7,9 +7,12 @@ import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 
 import javax.swing.JFrame;
-import java.awt.Toolkit;
+// import java.awt.Toolkit;
 
+import rendererInput.ClickType;
+import rendererInput.Mouse;
 import rendererPoint.MyPoint;
+import rendererPoint.PointConverter;
 import rendererShapes.MyPolygon;
 import rendererShapes.Tetrahedron;
 
@@ -26,12 +29,20 @@ public class Display extends Canvas implements Runnable {
 
     private Tetrahedron tetra;
 
+    private Mouse mouse;
+
     public Display() {
         this.frame = new JFrame();
         Dimension size = new Dimension(WIDTH, HEIGHT);
         this.setPreferredSize(size);
         // Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         // this.setSize(screenSize.width, screenSize.height);
+
+        this.mouse = new Mouse();
+
+        this.addMouseListener(this.mouse); //Aus Canvas-Library
+        this.addMouseMotionListener(this.mouse);
+        this.addMouseWheelListener(this.mouse);
     }
 
     public static void main(String[] args) {
@@ -107,7 +118,7 @@ public class Display extends Canvas implements Runnable {
             new MyPolygon(Color.WHITE, p1, p2, p6 , p5),
             new MyPolygon(Color.YELLOW, p1, p5, p8 , p4),
             new MyPolygon(new Color(255, 140, 26), p2, p6, p7 , p3),
-            new MyPolygon(Color.CYAN, p4, p3, p7 , p8),
+            new MyPolygon(Color.GREEN, p4, p3, p7 , p8),
             new MyPolygon(Color.RED, p5, p6, p7 , p8));
     }
 
@@ -128,7 +139,37 @@ public class Display extends Canvas implements Runnable {
         bs.show();
     }
 
+    ClickType prevMouse = ClickType.Unknown;
+    int initialX, initialY;
+    double mouseSensivity = 2.5;
+
     private void Update() {
-        this.tetra.Rotate(true, 1, 1, 0);
+        int x = this.mouse.getX();
+        int y = this.mouse.getY();
+        if(this.mouse.getButton() == ClickType.LeftClick) {
+            int xDif = x - initialX;
+            int yDif = y - initialY;
+
+            this.tetra.Rotate(true, 0, yDif/mouseSensivity, -xDif/mouseSensivity);
+        }
+        else if(this.mouse.getButton() == ClickType.RightClick) {
+            int xDif = x - initialX;
+
+            this.tetra.Rotate(true, -xDif/mouseSensivity, 0, 0);
+        }
+
+        if(this.mouse.getButton() == ClickType.ZoomIn) {
+            PointConverter.zoomIn();
+            System.out.println("ZoomIn");
+        }
+        else if(this.mouse.getButton() == ClickType.ZoomOut) {
+            PointConverter.zoomOut();
+            System.out.println("ZoomOut");
+        }
+
+        this.mouse.resetScroll();
+
+        initialX = x;
+        initialY = y;
     }
 }

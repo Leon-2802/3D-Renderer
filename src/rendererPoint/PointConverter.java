@@ -1,13 +1,20 @@
 package rendererPoint;
 
 import java.awt.Point;
-
 import renderer.Display;
 
 public class PointConverter {
 
     private static double scale = 1;
     private static int perspective = 1400;
+
+    public static final double ZoomFactor = 1.2;
+    public static void zoomIn() {
+        scale *= ZoomFactor;
+    }
+    public static void zoomOut() {
+        scale /= ZoomFactor;
+    }
     
     public static Point convertPoint(MyPoint point3D) {
         double x3d = point3D.y * scale;
