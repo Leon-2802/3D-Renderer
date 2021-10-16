@@ -35,9 +35,9 @@ public class Mouse implements MouseListener, MouseMotionListener, MouseWheelList
             case 3:
                 return ClickType.RightClick;
             case 4:
-                return ClickType.ZoomIn;
-            case 5: 
                 return ClickType.ZoomOut;
+            case 5: 
+                return ClickType.ZoomIn;
             default:
                 return ClickType.Unknown;
         }

@@ -143,7 +143,7 @@ public class Display extends Canvas implements Runnable {
     int initialX, initialY;
     double mouseSensivity = 2.5;
 
-    private void Update() {
+    private void Update() { //! Klasse machen zum einfachen umschalten zwischen MouseRotation und AutomaticRotation
         int x = this.mouse.getX();
         int y = this.mouse.getY();
         if(this.mouse.getButton() == ClickType.LeftClick) {
