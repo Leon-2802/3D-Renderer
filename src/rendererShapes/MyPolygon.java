@@ -1,6 +1,7 @@
 package rendererShapes;
 
 import rendererPoint.MyPoint;
+import rendererPoint.MyVector;
 import rendererPoint.PointConverter;
 
 import java.awt.Color;
@@ -36,12 +37,14 @@ public class MyPolygon {
         g.fillPolygon(poly);
     }
 
-    public void Rotate(boolean CW, double xDegrees, double yDegrees, double zDegrees) {
+    public void Rotate(boolean CW, double xDegrees, double yDegrees, double zDegrees, MyVector lightVector) {
         for(MyPoint p : points) {
             PointConverter.rotateAxisX(p, CW, xDegrees);
             PointConverter.rotateAxisY(p, CW, yDegrees);
             PointConverter.rotateAxisZ(p, CW, zDegrees);
         }
+
+        this.updateLightingRatio(lightVector);
     }
 
     public double GetAverageX() {
@@ -76,5 +79,17 @@ public class MyPolygon {
         }
 
         return polygons;
+    }
+
+    private void updateLightingRatio(MyVector lightVector) {
+        MyVector v1 = new MyVector(this.points[0], this.points[1]);
+        MyVector v2 = new MyVector(this.points[1], this.points[2]);
+        MyVector orthogonal = MyVector.normalize(MyVector.scalar(v2, v1));
+        double dot = MyVector.dot(orthogonal, lightVector);
+        double sign = dot < 0 ? -1 : 1;
+        dot = sign * dot * dot;
+        dot = (dot + 1) / 2 * 0.8;
+
+        this.lightRatio = AMBIENT_LIGHTING + dot;
     }
 }

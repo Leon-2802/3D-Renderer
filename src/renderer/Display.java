@@ -9,12 +9,8 @@ import java.awt.image.BufferStrategy;
 import javax.swing.JFrame;
 // import java.awt.Toolkit;
 
-import rendererInput.ClickType;
+import entity.EntityManager;
 import rendererInput.Mouse;
-import rendererPoint.MyPoint;
-import rendererPoint.PointConverter;
-import rendererShapes.MyPolygon;
-import rendererShapes.Tetrahedron;
 
 public class Display extends Canvas implements Runnable {
 
@@ -23,13 +19,15 @@ public class Display extends Canvas implements Runnable {
     private Thread thread;
     private JFrame frame;
     private static String title = "3D Renderer";
-    public static final int WIDTH = 800;
-    public static final int HEIGHT = 600;
+    public static final int WIDTH = 1280;
+    public static final int HEIGHT = 800;
     private static boolean running = false;
 
-    private Tetrahedron tetra;
+    private EntityManager entityManager;
 
     private Mouse mouse;
+    private boolean automaticRot = true;
+    double x, y, z;
 
     public Display() {
         this.frame = new JFrame();
@@ -39,6 +37,8 @@ public class Display extends Canvas implements Runnable {
         // this.setSize(screenSize.width, screenSize.height);
 
         this.mouse = new Mouse();
+
+        this.entityManager = new EntityManager();
 
         this.addMouseListener(this.mouse); //Aus Canvas-Library
         this.addMouseMotionListener(this.mouse);
@@ -61,6 +61,30 @@ public class Display extends Canvas implements Runnable {
         running = true;
         this.thread = new Thread(this, "Display");
         this.thread.start();
+
+        chooseInput();
+    }
+
+    private void chooseInput() {
+        String input;
+        System.out.println("Enter '0' if you want to control the rotation with Mouse, Enter '1' if you want automatic rotation");
+        input = System.console().readLine();
+        int rotation = Integer.parseInt(input);
+
+        if(rotation == 0) {
+            automaticRot = false;
+        }
+        else if(rotation == 1){
+            System.out.println("Enter the x, y and z values for the automatic rotation");
+            x = Double.parseDouble(System.console().readLine());
+            y = Double.parseDouble(System.console().readLine());
+            z = Double.parseDouble(System.console().readLine());
+            automaticRot = true;
+
+        }
+        else {
+            System.out.println("Only use '0' and '1'");
+        }
     }
 
     public synchronized void Stop() {
@@ -80,14 +104,14 @@ public class Display extends Canvas implements Runnable {
         double delta = 0;
         int frames = 0;
 
-        Init();
+        this.entityManager.init();
 
         while(running) {
             long now = System.nanoTime();
             delta += (now - lastTime) / ns;
             lastTime = now;
             while(delta >= 1) {
-                Update();
+                Update(automaticRot);
                 delta--;
             }
             Render();
@@ -103,25 +127,6 @@ public class Display extends Canvas implements Runnable {
         Stop();
     }
 
-    private void Init() {
-        int s = 100;
-        MyPoint p1 = new MyPoint(s/2, -s/2, -s/2);
-        MyPoint p2 = new MyPoint(s/2, s/2, -s/2);
-        MyPoint p3 = new MyPoint(s/2, s/2, s/2);
-        MyPoint p4 = new MyPoint(s/2, -s/2, s/2);
-        MyPoint p5 = new MyPoint(-s/2, -s/2, -s/2);
-        MyPoint p6 = new MyPoint(-s/2, s/2, -s/2);
-        MyPoint p7 = new MyPoint(-s/2, s/2, s/2);
-        MyPoint p8 = new MyPoint(-s/2, -s/2, s/2);
-        this.tetra = new Tetrahedron( 
-            new MyPolygon(Color.BLUE, p1, p2, p3 , p4),
-            new MyPolygon(Color.WHITE, p1, p2, p6 , p5),
-            new MyPolygon(Color.YELLOW, p1, p5, p8 , p4),
-            new MyPolygon(new Color(255, 140, 26), p2, p6, p7 , p3),
-            new MyPolygon(Color.GREEN, p4, p3, p7 , p8),
-            new MyPolygon(Color.RED, p5, p6, p7 , p8));
-    }
-
     private void Render() {
         BufferStrategy bs = this.getBufferStrategy();
         if(bs == null) {
@@ -133,43 +138,18 @@ public class Display extends Canvas implements Runnable {
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, WIDTH, HEIGHT);
 
-        tetra.Render(g);
+        this.entityManager.render(g);
 
         g.dispose();
         bs.show();
     }
 
-    ClickType prevMouse = ClickType.Unknown;
-    int initialX, initialY;
-    double mouseSensivity = 2.5;
+    private void Update(boolean automaticRot) {
 
-    private void Update() { //! Klasse machen zum einfachen umschalten zwischen MouseRotation und AutomaticRotation
-        int x = this.mouse.getX();
-        int y = this.mouse.getY();
-        if(this.mouse.getButton() == ClickType.LeftClick) {
-            int xDif = x - initialX;
-            int yDif = y - initialY;
+        if(automaticRot == false)
+            this.entityManager.update(this.mouse);
+        else
+            this.entityManager.automaticUpdate(this.mouse, true, x, y, z);
 
-            this.tetra.Rotate(true, 0, yDif/mouseSensivity, -xDif/mouseSensivity);
-        }
-        else if(this.mouse.getButton() == ClickType.RightClick) {
-            int xDif = x - initialX;
-
-            this.tetra.Rotate(true, -xDif/mouseSensivity, 0, 0);
-        }
-
-        if(this.mouse.getButton() == ClickType.ZoomIn) {
-            PointConverter.zoomIn();
-            System.out.println("ZoomIn");
-        }
-        else if(this.mouse.getButton() == ClickType.ZoomOut) {
-            PointConverter.zoomOut();
-            System.out.println("ZoomOut");
-        }
-
-        this.mouse.resetScroll();
-
-        initialX = x;
-        initialY = y;
     }
 }

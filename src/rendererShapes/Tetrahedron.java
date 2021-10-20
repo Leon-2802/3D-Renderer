@@ -8,10 +8,13 @@ public class Tetrahedron {
     private MyPolygon[] polygons;
     private Color color;
 
-    public Tetrahedron(Color color, MyPolygon... polygons) {
+    public Tetrahedron(Color color, Boolean decay, MyPolygon... polygons) {
         this.color = color;
         this.polygons = polygons;
-        this.SetPolygonColor();
+        if(decay)
+            this.SetDecayingPolygonColor();
+        else
+            this.SetPolygonColor();
     }
     public Tetrahedron(MyPolygon... polygons) {
         this.color = Color.WHITE;
@@ -38,6 +41,17 @@ public class Tetrahedron {
     private void SetPolygonColor() {
         for(MyPolygon poly : this.polygons) {
             poly.SetColor(this.color);
+        }
+    }
+
+    private void SetDecayingPolygonColor() {
+        double decayFactor = 0.95;
+        for(MyPolygon poly : this.polygons) {
+            poly.SetColor(this.color);
+            int r = (int) (this.color.getRed() * decayFactor);
+            int g = (int) (this.color.getGreen() * decayFactor);
+            int b = (int) (this.color.getBlue() * decayFactor);
+            this.color = new Color(r, g, b);
         }
     }
 }
