@@ -49,7 +49,6 @@ public class Mouse implements MouseListener, MouseMotionListener, MouseWheelList
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         scroll = e.getWheelRotation();
-        System.out.println(scroll);
     }
 
     @Override

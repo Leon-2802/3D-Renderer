@@ -32,7 +32,7 @@ public class MyVector {
     
     }
 
-    public static MyVector normalize(MyVector v) {
+    public static MyVector normalize(MyVector v) { //Fixed Länge des Vectors
         double magnitude = Math.sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
         return new MyVector(v.x/magnitude, v.y/magnitude, v.z/magnitude);
     }

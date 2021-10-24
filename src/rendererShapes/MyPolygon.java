@@ -14,12 +14,14 @@ import java.util.Comparator;
 import java.util.List;
 
 public class MyPolygon {
+
+    private static final double AmbientLight = 0.05;
     
     private MyPoint[] points;
-    private Color color;
+    private Color baseColor, lightColor;
 
     public MyPolygon(Color color, MyPoint... points) {
-        this.color = color;
+        this.baseColor = this.lightColor = color;
         this.points = new MyPoint[points.length];
         for(int i = 0; i < points.length; i++) {
             MyPoint p = points[i];
@@ -33,7 +35,8 @@ public class MyPolygon {
             Point p = PointConverter.convertPoint(points[i]);
             poly.addPoint(p.x, p.y);
         }
-        g.setColor(this.color);
+
+        g.setColor(this.lightColor);
         g.fillPolygon(poly);
     }
 
@@ -44,7 +47,7 @@ public class MyPolygon {
             PointConverter.rotateAxisZ(p, CW, zDegrees);
         }
 
-        this.updateLightingRatio(lightVector);
+        this.setLighting(lightVector);
     }
 
     public double GetAverageX() {
@@ -57,7 +60,7 @@ public class MyPolygon {
     }
 
     public void SetColor(Color color) {
-        this.color = color;
+        this.baseColor = color;
     }
 
     public static MyPolygon[] sortPolygons(MyPolygon[] polygons) {
@@ -81,15 +84,28 @@ public class MyPolygon {
         return polygons;
     }
 
-    private void updateLightingRatio(MyVector lightVector) {
+    public void setLighting(MyVector lightVector) { //setzt die Anpassung der blanken Farbwerte zum Lighting
+        if(this.points.length < 3) 
+            return;
+
         MyVector v1 = new MyVector(this.points[0], this.points[1]);
         MyVector v2 = new MyVector(this.points[1], this.points[2]);
         MyVector orthogonal = MyVector.normalize(MyVector.scalar(v2, v1));
         double dot = MyVector.dot(orthogonal, lightVector);
         double sign = dot < 0 ? -1 : 1;
         dot = sign * dot * dot;
-        dot = (dot + 1) / 2 * 0.8;
+        dot = (dot + 1) / 2 * (1 - AmbientLight);
 
-        this.lightRatio = AMBIENT_LIGHTING + dot;
+        double lightRatio = Math.min(1, Math.max(0, AmbientLight + dot)); //Verhindert Crashes wo die Farbwerte über 255 oder unter 0 verschoben werden
+        this.updateLightingColor(lightRatio);
+    }
+
+    private void updateLightingColor( double lightRatio) { //Setzt die endgültige LightingColor
+
+        int red = (int) (this.baseColor.getRed() * lightRatio);
+        int green = (int) (this.baseColor.getGreen() * lightRatio);
+        int blue = (int) (this.baseColor.getBlue() * lightRatio);
+        this.lightColor = new Color(red, green, blue);
+
     }
 }

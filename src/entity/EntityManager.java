@@ -6,6 +6,7 @@ import java.util.List;
 import builder.BasicEntityBuilder;
 import rendererInput.ClickType;
 import rendererInput.Mouse;
+import rendererPoint.MyVector;
 import rendererPoint.PointConverter;
 
 import java.awt.Color;
@@ -16,13 +17,14 @@ public class EntityManager {
     private List<IEntity> entities;
     private int initialX, initialY;
     private double mouseSensivity = 2.5;
+    private MyVector lightVector = MyVector.normalize(new MyVector(1, 1, 1));
 
     public EntityManager() {
         this.entities = new ArrayList<IEntity>();
     }
     
     public void init() { //Hier das zu erstellende Objekt initieren!
-        this.entities.add(BasicEntityBuilder.createDiamond(Color.PINK, 100, 0, 0, 0));
+        this.entities.add(BasicEntityBuilder.createDiamond(Color.CYAN, 100, 0, 0, 0));
     }
 
     public void update(Mouse mouse) {
@@ -74,7 +76,13 @@ public class EntityManager {
 
     private void rotate(boolean direction, double xAngle, double yAngle, double zAngle) {
         for(IEntity entity : this.entities) {
-            entity.rotate(direction, xAngle, yAngle, zAngle);
+            entity.rotate(direction, xAngle, yAngle, zAngle, this.lightVector);
+        }
+    }
+
+    private void setLighting() {
+        for(IEntity entity : this.entities) {
+            entity.setLighting(this.lightVector);
         }
     }
 }
