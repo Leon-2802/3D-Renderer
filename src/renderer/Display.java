@@ -6,8 +6,13 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
-// import java.awt.Toolkit;
+import javax.swing.JPanel;
+
+import controls.ControlPanel;
+
+import java.awt.GridLayout;
 
 import entity.EntityManager;
 import rendererInput.Mouse;
@@ -18,23 +23,38 @@ public class Display extends Canvas implements Runnable {
 
     private Thread thread;
     private JFrame frame;
+
+    private JFrame controlsFrame;
+    static JButton[] button = new JButton[2];
+    private JPanel panel = new JPanel();
+
     private static String title = "3D Renderer";
     public static final int WIDTH = 1280;
     public static final int HEIGHT = 800;
+    public static final int CONTROLS_WIDTH = 300;
+    public static final int CONTROLS_HEIGHT = 100;
     private static boolean running = false;
 
     private EntityManager entityManager;
 
     private Mouse mouse;
-    private boolean automaticRot = true;
-    double x, y, z;
+    public boolean automaticRot = true;
+    public double x, y, z;
 
     public Display() {
-        this.frame = new JFrame();
+        //Hauptdisplay:
+        this.frame = new JFrame(title);
         Dimension size = new Dimension(WIDTH, HEIGHT);
         this.setPreferredSize(size);
-        // Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        // this.setSize(screenSize.width, screenSize.height);
+        
+        //ControlPanel:
+        this.controlsFrame = new JFrame(title);
+        this.controlsFrame.setLayout(new GridLayout(1, 2, 10, 0));
+        panel.setLayout(new GridLayout(2, 4, 5, 0));
+        JPanel scrollPanel = new JPanel();
+        scrollPanel.setLayout(new GridLayout(2, 2, 5, 5));
+		controlsFrame.add(panel);
+		controlsFrame.add(scrollPanel);
 
         this.mouse = new Mouse();
 
@@ -47,13 +67,18 @@ public class Display extends Canvas implements Runnable {
 
     public static void main(String[] args) {
         Display display = new Display();
-        display.frame.setTitle(title);
         display.frame.add(display);
         display.frame.pack();
         display.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         display.frame.setLocationRelativeTo(null);
         display.frame.setResizable(false);
         display.frame.setVisible(true);
+
+        display.controlsFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        display.controlsFrame.setLocationRelativeTo(null);
+        display.controlsFrame.setResizable(false);
+        display.controlsFrame.setVisible(true);
+
         display.Start();
     }
 
@@ -62,30 +87,36 @@ public class Display extends Canvas implements Runnable {
         this.thread = new Thread(this, "Display");
         this.thread.start();
 
-        chooseInput();
+        // chooseInput();
+        createControlsFrame();
     }
 
-    private void chooseInput() {
-        String input;
-        System.out.println("Enter '0' if you want to control the rotation with Mouse, Enter '1' if you want automatic rotation");
-        input = System.console().readLine();
-        int rotation = Integer.parseInt(input);
+    private void createControlsFrame() {
+        for(int b = 0; b < button.length; b++) {
+            button[b] = new JButton();
+            button[b].setBackground(Color.WHITE);
+            button[b].addActionListener(new ControlPanel(button[b], controlsFrame, this));
+            panel.add(button[b]);
+        }
 
-        if(rotation == 0) {
-            automaticRot = false;
-        }
-        else if(rotation == 1){
-            System.out.println("Enter the x, y and z values for the automatic rotation");
-            x = Double.parseDouble(System.console().readLine());
-            y = Double.parseDouble(System.console().readLine());
-            z = Double.parseDouble(System.console().readLine());
-            automaticRot = true;
+        button[0].setText("Mouse Controls");
+        button[1].setText("Automatic Rotation");
 
-        }
-        else {
-            System.out.println("Only use '0' and '1'");
-        }
+        controlsFrame.pack();
     }
+    // private void chooseInput() {
+    //    if(rotation == 1){
+    //         System.out.println("Enter the x, y and z values for the automatic rotation");
+    //         x = Double.parseDouble(System.console().readLine());
+    //         y = Double.parseDouble(System.console().readLine());
+    //         z = Double.parseDouble(System.console().readLine());
+    //         automaticRot = true;
+
+    //     }
+    //     else {
+    //         System.out.println("Only use '0' and '1'");
+    //     }
+    // }
 
     public synchronized void Stop() {
         running = false;
