@@ -36,8 +36,8 @@ public class Display extends Canvas implements Runnable {
     JPanel rotationPanel = new JPanel();
 
     private static String title = "3D Renderer";
-    public static final int WIDTH = 1280;
-    public static final int HEIGHT = 800;
+    public static final int WIDTH = 1920;
+    public static final int HEIGHT = 1080;
     public static final int CONTROLS_WIDTH = 300;
     public static final int CONTROLS_HEIGHT = 100;
     private static boolean running = false;

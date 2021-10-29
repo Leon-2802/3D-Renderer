@@ -24,8 +24,8 @@ public class EntityManager {
     }
     
     public void init() { //Hier das zu erstellende Objekt initieren!
-        //this.entities.add(BasicEntityBuilder.createDiamond(Color.CYAN, 100, 0, 0, 0));
-        this.entities.add(BasicEntityBuilder.createCube(100, 0, 0, 0));
+        this.entities.add(BasicEntityBuilder.createDiamond(Color.YELLOW, 100, 0, 0, 0));
+        //this.entities.add(BasicEntityBuilder.createCube(100, 0, 0, 0));
     }
 
     public void update(Mouse mouse) {
