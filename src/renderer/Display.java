@@ -9,8 +9,13 @@ import java.awt.image.BufferStrategy;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
 
-import controls.ControlPanel;
+import controls.ControlPanelMode;
+import controls.ControlPanelValues;
+import controls.ControlPanelMode;
 
 import java.awt.GridLayout;
 
@@ -27,6 +32,8 @@ public class Display extends Canvas implements Runnable {
     private JFrame controlsFrame;
     static JButton[] button = new JButton[2];
     private JPanel panel = new JPanel();
+    public static JSpinner[] numberFields = new JSpinner[3];
+    JPanel rotationPanel = new JPanel();
 
     private static String title = "3D Renderer";
     public static final int WIDTH = 1280;
@@ -39,7 +46,7 @@ public class Display extends Canvas implements Runnable {
 
     private Mouse mouse;
     public boolean automaticRot = true;
-    public double x, y, z;
+    public int x, y, z;
 
     public Display() {
         //Hauptdisplay:
@@ -47,14 +54,13 @@ public class Display extends Canvas implements Runnable {
         Dimension size = new Dimension(WIDTH, HEIGHT);
         this.setPreferredSize(size);
         
-        //ControlPanel:
-        this.controlsFrame = new JFrame(title);
+        //ControlPanelMode:
+        this.controlsFrame = new JFrame("3D Renderer | Controls");
         this.controlsFrame.setLayout(new GridLayout(1, 2, 10, 0));
         panel.setLayout(new GridLayout(2, 4, 5, 0));
-        JPanel scrollPanel = new JPanel();
-        scrollPanel.setLayout(new GridLayout(2, 2, 5, 5));
+        rotationPanel.setLayout(new GridLayout(1, 3, 5, 5));
 		controlsFrame.add(panel);
-		controlsFrame.add(scrollPanel);
+		controlsFrame.add(rotationPanel);
 
         this.mouse = new Mouse();
 
@@ -87,7 +93,6 @@ public class Display extends Canvas implements Runnable {
         this.thread = new Thread(this, "Display");
         this.thread.start();
 
-        // chooseInput();
         createControlsFrame();
     }
 
@@ -95,28 +100,23 @@ public class Display extends Canvas implements Runnable {
         for(int b = 0; b < button.length; b++) {
             button[b] = new JButton();
             button[b].setBackground(Color.WHITE);
-            button[b].addActionListener(new ControlPanel(button[b], controlsFrame, this));
+            button[b].addActionListener(new ControlPanelMode(button[b], controlsFrame, this));
             panel.add(button[b]);
         }
-
         button[0].setText("Mouse Controls");
         button[1].setText("Automatic Rotation");
 
+        for(int c = 0; c < numberFields.length; c++) {
+            SpinnerModel number = new SpinnerNumberModel(0, 0, 10, 1);
+            numberFields[c] = new JSpinner(number);
+            numberFields[c].addChangeListener(new ControlPanelValues(numberFields[c], this));
+            String name = Integer.toString(c);
+            numberFields[c].setName(name);
+            rotationPanel.add(numberFields[c]);
+        }
+
         controlsFrame.pack();
     }
-    // private void chooseInput() {
-    //    if(rotation == 1){
-    //         System.out.println("Enter the x, y and z values for the automatic rotation");
-    //         x = Double.parseDouble(System.console().readLine());
-    //         y = Double.parseDouble(System.console().readLine());
-    //         z = Double.parseDouble(System.console().readLine());
-    //         automaticRot = true;
-
-    //     }
-    //     else {
-    //         System.out.println("Only use '0' and '1'");
-    //     }
-    // }
 
     public synchronized void Stop() {
         running = false;

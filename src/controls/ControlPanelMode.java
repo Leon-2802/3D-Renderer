@@ -8,13 +8,13 @@ import javax.swing.JFrame;
 
 import renderer.Display;
 
-public class ControlPanel implements ActionListener {
+public class ControlPanelMode implements ActionListener {
 
     JButton button;
     JFrame frame;
     Display display;
 
-    public ControlPanel(JButton button, JFrame frame, Display display) {
+    public ControlPanelMode(JButton button, JFrame frame, Display display) {
         this.button = button;
         this.frame = frame;
         this.display = display;
@@ -27,9 +27,9 @@ public class ControlPanel implements ActionListener {
             System.out.println("Mouse");
         }
         if(button.getText() == "Automatic Rotation") {
+            display.automaticRot = true;
             System.out.println("auto");
         }
-        
     }
 
 

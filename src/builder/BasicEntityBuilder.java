@@ -62,7 +62,7 @@ public class BasicEntityBuilder {
         }
         polygons[edges * 2] = new MyPolygon(color, innerPoints);//Top-Part, innerhalb der inneren Punkte
 
-        Tetrahedron tetra = new Tetrahedron(color, true, polygons);
+        Tetrahedron tetra = new Tetrahedron(color, false, polygons);
         tetras.add(tetra);
 
         return new Entity(tetras);
