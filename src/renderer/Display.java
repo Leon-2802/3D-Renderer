@@ -13,14 +13,13 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 
-import controls.ControlPanelMode;
-import controls.ControlPanelValues;
-import controls.ControlPanelMode;
+import renderer.controls.ControlPanelMode;
+import renderer.controls.ControlPanelValues;
 
 import java.awt.GridLayout;
 
-import entity.EntityManager;
-import rendererInput.Mouse;
+import renderer.entity.EntityManager;
+import renderer.input.UserInput;
 
 public class Display extends Canvas implements Runnable {
 
@@ -36,15 +35,15 @@ public class Display extends Canvas implements Runnable {
     JPanel rotationPanel = new JPanel();
 
     private static String title = "3D Renderer";
-    public static final int WIDTH = 1920;
-    public static final int HEIGHT = 1080;
+    public static final int WIDTH = 1280;
+    public static final int HEIGHT = 800;
     public static final int CONTROLS_WIDTH = 300;
     public static final int CONTROLS_HEIGHT = 100;
     private static boolean running = false;
 
     private EntityManager entityManager;
 
-    private Mouse mouse;
+    private UserInput userInput;
     public boolean automaticRot = true;
     public int x, y, z;
 
@@ -62,13 +61,14 @@ public class Display extends Canvas implements Runnable {
 		controlsFrame.add(panel);
 		controlsFrame.add(rotationPanel);
 
-        this.mouse = new Mouse();
+        this.userInput = new UserInput();
 
         this.entityManager = new EntityManager();
 
-        this.addMouseListener(this.mouse); //Aus Canvas-Library
-        this.addMouseMotionListener(this.mouse);
-        this.addMouseWheelListener(this.mouse);
+        this.addMouseListener(this.userInput.mouse); //Aus Canvas-Library
+        this.addMouseMotionListener(this.userInput.mouse);
+        this.addMouseWheelListener(this.userInput.mouse);
+        this.addKeyListener(this.userInput.keyboard);
     }
 
     public static void main(String[] args) {
@@ -135,7 +135,7 @@ public class Display extends Canvas implements Runnable {
         double delta = 0;
         int frames = 0;
 
-        this.entityManager.init();
+        this.entityManager.init(this.userInput);
 
         while(running) {
             long now = System.nanoTime();
@@ -178,9 +178,9 @@ public class Display extends Canvas implements Runnable {
     private void Update(boolean automaticRot) {
 
         if(automaticRot == false)
-            this.entityManager.update(this.mouse);
+            this.entityManager.update(this.userInput);
         else
-            this.entityManager.automaticUpdate(this.mouse, true, x, y, z);
+            this.entityManager.automaticUpdate(this.userInput, true, x, y, z);
 
     }
 }
